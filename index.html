@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+	<title>Brief Sim</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="styles/game-style.css" />
+	<meta name="description" content="A fork of a fork spliced with another fork" />
+
+	<!-- JS utilities -->
+	<script type="application/javascript" src="scripts/lz-string.js"></script>
+	<script type="application/javascript" src="scripts/jsutils.js"></script>
+
+	<!-- Polyfill from https://developer.mozilla.org/en-US/docs/Web/API/Element.classList -->
+	<script type="application/javascript" src="scripts/classList.js"></script>
+	<script type="application/javascript" src="scripts/ui.js"></script>
+	<!-- Main program -->
+	<script type="application/javascript" src="scripts/game-classes.js" defer="defer"></script>
+	<script type="application/javascript" src="scripts/game-data.js" defer="defer"></script>
+	<script type="application/javascript" src="scripts/game-updates.js" defer="defer"></script>
+	<script type="application/javascript" src="scripts/game.js" defer="defer"></script>
+</head>
+<body>
+
+<div id="strip">
+	<div id="header">
+		<h1>The <span id="civType">Thorp</span> of <span id="civName">Woodstock</span></h1>
+		<div id="ruler">Ruled by the <span id="appellation">mighty</span> <span id="rulerName">Orteil</span></div>
+	</div>
+	<div id="stripInner">
+		<span class="title">A Brief Sim Through Time</span>
+    <h4> A fork of a fork, spliced with another fork. Topped with a sprinkle of fork. </h4>
+		<span class="version">v0.0.01</span>
+	</div>
+</div>
+
+
+
+<div id="main" class="columns">
+<div id="leftColumn" class="column left">
+	<div id="primaryResourcesContainer" class="civSection">
+		<table id="clickActions" class="actions">
+				<!-- populated by javascript -->
+		</table>
+		<table id="primaryResources" class="resources">
+			<!-- populated by javascript -->
+		</table>
+	</div>
+	<div id="populationContainer" class="civSection">
+		<div id="populationNumbers">
+			<table class="resources">
+				<tbody>
+					<tr>
+						<td>
+						<!--	<img src="images/backup.png" class="icon icon-lg" alt="Population"/> -->
+							<label>Population:</label>
+						</td>
+						<td class="number"><span data-display="display_pop" data-target="living">...</span></td>
+						<td class="number maxNumber">
+							/ max: <span data-display="display_pop" data-target="limit">...</span>
+						</td>
+						<td class="note">
+							Build more housing to grow your civilization
+						</td>
+					</tr>
+
+					<tr>
+						<td>
+							<!-- <img src="images/smitten.png" class="icon icon-lg" alt="Happiness"/> -->
+							<label>Happiness:</label>
+						</td>
+						<td colspan="3" id="morale">
+							<ol class="happinessRanks">
+								<li>Blissful</li>
+								<li>Happy</li>
+								<li>Content</li>
+								<li>Unhappy</li>
+								<li>Angry</li>
+							</ol>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div id="jobsContainer" class="civSection">
+		<div id="populationBar" class="bar" title="Population">
+			<!-- populated by javascript -->
+		</div>
+		<div id="populationCreate">
+			<div>
+				Recruit new citizens as
+				<select type="dropdown" id="newSpawnJobSelection">
+					<option value="unemployed">Idle Citizens</option>
+					<option value="farmer">Farmers</option>
+					<option value="woodcutter">Woodcutters</option>
+					<option value="miner">Miners</option>
+				</select>
+				<span class="cost">for <span id="workerCost">...</span> food</span><span class="note">.</span>
+				<button class="unit1" id="spawn1button" onmousedown="spawn(1)">+1</button>
+				<button class="unit10" id="spawn10button" onmousedown="spawn(10)">+10</button>
+				<button class="unit100" id="spawn100button" onmousedown="spawn(100)">+100</button>
+				<button class="unit1000" id="spawn1000button" onmousedown="spawn(1000)">+1k</button>
+				<button class="unitInfinity" id="spawnMaxbutton" onmousedown="spawn(Infinity)">+<span id="workerNumMax">Max</span></button>
+			</div>
+			<div id="customSpawnQuantity">
+				<button id="spawnCustomButton" onmousedown="spawn('custom')">Recruit Citizens</button><input id="spawnCustomQty" type="number" min="1" step="1" value="1" />
+			</div>
+		</div>
+		<p id="customJobQuantity">
+			Custom Quantity <input id="homeCustomQty" type="number" min="1" step="1" value="1" />
+		</p>
+		<table id="jobs">
+			<!-- populated by javascript -->
+		</table>
+	</div>
+	<div id="eventsContainer" class="civSection">
+		<h3>Events</h3>
+		<table id="logTable">
+			<tr id="log0"><td id="logT"></td><td id="logL"></td><td id="logR"></td></tr>
+			<tr id="log1"><td colspan="3"></td></tr>
+			<tr id="log2"><td colspan="3"></td></tr>
+			<tr id="log3"><td colspan="3"></td></tr>
+			<tr id="log4"><td colspan="3"></td></tr>
+			<tr id="log5"><td colspan="3"></td></tr>
+			<tr id="log6"><td colspan="3"></td></tr>
+			<!--
+			<tr id="log7"><td colspan="3"></td></tr>
+			<tr id="log8"><td colspan="3"></td></tr>
+			<tr id="log9"><td colspan="3"></td></tr> -->
+		</table>
+	</div>
+</div>
+
+
+<div id="rightColumn" class="column right">
+	<div id="secondaryResourcesContainer" class="civSection">
+		<table class="resources">
+			<tbody>
+				<tr>
+					<td>
+						<!-- <img src="images/skins.png" class="icon icon-lg" alt="Skins"/> -->
+						<label>Skins:</label>
+					</td>
+					<td>
+						<span class="number" data-display="display" data-target="skins">0</span>
+					</td>
+					<td>
+						<span class="number net" data-display="displayNet" data-target="skins">0</span><span class="perSecond">/s</span>
+					</td>
+					<td>
+						<!-- <img src="images/leather.png" class="icon icon-lg" alt="Leather"/> -->
+						<label>Leather:</label>
+					</td>
+					<td>
+						<span class="number" data-display="display" data-target="leather">0</span>
+					</td>
+					<td>
+						<span class="number net" data-display="displayNet" data-target="leather">0</span><span class="perSecond">/s</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<!-- <img src="images/herbs.png" class="icon icon-lg" alt="Herbs"/> -->
+						<label>Herbs:</label>
+					</td>
+					<td>
+						<span class="number" data-display="display" data-target="herbs">0</span>
+					</td>
+					<td>
+						<span class="number net" data-display="displayNet" data-target="herbs">0</span><span class="perSecond">/s</span>
+					</td>
+
+				</tr>
+				<tr>
+					<td>
+						<!-- <img src="images/ore.png" class="icon icon-lg" alt="Ore"/> -->
+						<label>Ore:</label>
+					</td>
+					<td>
+						<span class="number" data-display="display" data-target="ore">0</span>
+					</td>
+					<td>
+						<span class="number net" data-display="displayNet" data-target="ore">0</span><span class="perSecond">/s</span>
+					</td>
+					<td>
+						<!-- <img src="images/metal.png" class="icon icon-lg" alt="Metal"/> -->
+						<label>Metal:</label>
+					</td>
+					<td>
+						<span class="number" data-display="display" data-target="metal">0</span>
+					</td>
+					<td>
+						<span class="number net" data-display="displayNet" data-target="metal">0</span><span class="perSecond">/s</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<!--  <img src="images/gold.png" class="icon icon-lg" alt="Gold" /> -->
+						<label>Gold:</label>
+					</td>
+					<td colspan="2">
+						<span class="number" data-display="display" data-target="gold">0</span>
+					</td>
+					<td>
+						<!-- <img src="images/carrion.png" class="icon icon-lg" alt="Corpses"> -->
+						<label>Corpses:</label>
+					</td>
+					<td colspan="2">
+						<span class="number" data-display="display" data-target="corpses">0</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+
+	<div id="panesSelectors" class="civSection">
+		<div id="selectors" class="panesTabs">
+			<div id="buildingsSelect" class="paneSelector selected" data-target="buildingsPane" onclick="paneSelect(this)">
+				Buildings
+				<div class="alert">!</div>
+			</div>
+
+			<div id="achievementsSelect" class="paneSelector" data-target="achievementsPane" onclick="paneSelect(this)">
+				Achievements
+				<div class="alert">!</div>
+			</div>
+		</div>
+
+		<div id="buildingsPane" class="selectPane selected">
+			<div class="landCols cols">
+				<div class="col">
+					Total Buildings: <span id="totalBuildings">...</span><br />
+				</div>
+				<div class="col">
+					Total Land: <span id="totalLand">...</span><br />
+				</div>
+			</div>
+			<div id="landBar" class="bar" title="Land usage">
+				<!-- populated by javascript -->
+			</div>
+			<p id="customBuildQuantity">
+				Custom Quantity <input id="buildingCustomQty" type="number" min="1" step="1" value="1" />
+			</p>
+			<table id="buildings">
+				<!-- populated by javascript -->
+			</table>
+			<div id="graveTotal">
+				Unfilled Graves: <span data-display="display" data-target="grave">...</span>
+			</div>
+		</div>
+
+
+
+		<div id="achievementsPane" class="selectPane">
+			<div class="stats">
+				Resource clicks: <span id="clicks">0</span>
+			</div>
+		</div>
+
+	</div>
+
+</div>
+</div>
+<footer>
+	<!--
+	<span class="title">CivClicker v1.2</span>
+	<a href="http://dhmstark.co.uk/games/civclicker/">Original 1.0 Game</a>
+	<a href="faq.html">FAQ</a>
+	<a href="updates.html">Updates</a>
+	<a href="https://github.com/deathraygames/civ-clicker/">Source</a>
+	<a href="https://www.reddit.com/r/CivClicker/">Reddit</a>
+	-->
+</footer>
+</body>
+</html>
